@@ -13,18 +13,15 @@ abstract class SpaceShip {
   Map hit(int firePower);
 
   // isDestroy 
-  bool isDestroy();
+  bool isDestroy() {
+    return health <= 0;
+  }
 }
 
-class ArmoredSpaceShip implements SpaceShip {
+class ArmoredSpaceShip extends SpaceShip {
   // Randomly absords hit
   // Reduce damage in percentage 
   int maxArmorPower;
-
-  @override
-  double health;
-  @override
-  int firePower;
 
   @override 
   Map hit(int damage) {
@@ -43,22 +40,12 @@ class ArmoredSpaceShip implements SpaceShip {
     return {"name":"Armor Ship", "health": health, "damage": finalDamage};
   }
 
-  @override 
-  bool isDestroy() {
-    return true;
-  }
-
-  ArmoredSpaceShip(this.maxArmorPower, this.health, this.firePower);
+  ArmoredSpaceShip(this.maxArmorPower, double health, int firePower) : super(health, firePower);
 }
 
-class HightSpeedSpaceShip implements SpaceShip{
+class HightSpeedSpaceShip extends SpaceShip{
   // Whether dodges hit or not
   bool dodging; 
-
-  @override
-  double health;
-  @override
-  int firePower;
 
   @override 
   Map hit(int damage) {
@@ -77,12 +64,7 @@ class HightSpeedSpaceShip implements SpaceShip{
     return {"name":"Speed Ship", "health": health, "damage": damage};
   }
 
-  @override 
-  bool isDestroy() {
-    return true;
-  }
-
-  HightSpeedSpaceShip(this.dodging, this.health, this.firePower);
+  HightSpeedSpaceShip(this.dodging, double health, int firePower) : super(health, firePower);
 }
 
 class BattleField {
@@ -103,7 +85,7 @@ class BattleField {
       print("\x1B[32mName: ${armorMessage["name"]}, Damage: ${armorMessage["damage"]} Health: ${armorMessage["health"]}\n\x1B[0m");
       
       // Ship has no more health
-      if (armorShip.health <= 0){
+      if (armorShip.isDestroy()){
         return {"name":"Armor Ship", "isDestroy":armorShip.isDestroy()};
       }
       // Change player
@@ -115,7 +97,7 @@ class BattleField {
       print("\x1B[34mName: ${speedMessage["name"]}, Damage: ${speedMessage["damage"]} Health: ${speedMessage["health"]}\n\x1B[0m");
      
       // Ship has no more health
-      if (speedShip.health <= 0){
+      if (speedShip.isDestroy()){
         return {"name":"Speed Ship", "isDestroy":speedShip.isDestroy()};
       }
       // Change player
@@ -152,7 +134,7 @@ void main(List<String> arguments) {
     }
 
     // Slow down the game
-    sleep(Duration(milliseconds:1000));
+    // sleep(Duration(milliseconds:1000));
   }while(!progess["isDestroy"]);
   
 
