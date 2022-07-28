@@ -13,17 +13,14 @@ abstract class SpaceShip {
   Map hit(int firePower);
 
   // isDestroy 
-  bool isDestroy() {
-    print(health);
-    return true;
-  }
+  bool isDestroy();
 }
 
 class ArmoredSpaceShip implements SpaceShip {
   // Randomly absords hit
   // Reduce damage in percentage 
-  // max 40% but will be random
   int maxArmorPower;
+
   @override
   double health;
   @override
@@ -31,18 +28,18 @@ class ArmoredSpaceShip implements SpaceShip {
 
   @override 
   Map hit(int damage) {
+    // Get random value for armor
     final random = Random();
     int min = 1;
     int max = maxArmorPower;
     int randomNumber = min + random.nextInt(max - min);
 
+    // Get the reduced damage
     double finalDamage = damage * (100 - randomNumber)/100;
+    print("\x1B[32mName: Armor Ship, Blocked: ${damage - finalDamage}\x1B[0m");
 
-    print("Name: Armor Ship, Blocked: ${damage - finalDamage}");
-
-
+    // Deduct health
     health = health - finalDamage;
-
     return {"name":"Armor Ship", "health": health, "damage": finalDamage};
   }
 
@@ -65,13 +62,15 @@ class HightSpeedSpaceShip implements SpaceShip{
 
   @override 
   Map hit(int damage) {
+    // Get random boolean value
     final random = Random();
     dodging = random.nextBool();
 
+    // Dodge attack if true
     if (dodging){
       health = health - damage;
     } else {
-      print("Name: Speed Ship, Dodged Attack!");
+      print("\x1B[34mName: Speed Ship, Dodged Attack!\x1B[0m");
       damage = 0;
     }
     
@@ -87,55 +86,73 @@ class HightSpeedSpaceShip implements SpaceShip{
 }
 
 class BattleField {
+  /* 
+    Randomly a spaceship is selected and hit first
+    Spaceship hits each other 
+    Until one of them is destroyed 
+  */
+
   bool attack;
 
   Map startBattle(SpaceShip armorShip, SpaceShip speedShip) { 
 
+    // Attack Armored Ship if true
     if (attack){
+      // Getting Attack details
       Map armorMessage = armorShip.hit(speedShip.firePower);
-      print("Name: ${armorMessage["name"]}, Damage: ${armorMessage["damage"]} Health: ${armorMessage["health"]}\n");
+      print("\x1B[32mName: ${armorMessage["name"]}, Damage: ${armorMessage["damage"]} Health: ${armorMessage["health"]}\n\x1B[0m");
+      
+      // Ship has no more health
       if (armorShip.health <= 0){
         return {"name":"Armor Ship", "isDestroy":armorShip.isDestroy()};
       }
-
+      // Change player
       attack = false;
       
     } else {
+      // Getting Attack details
       Map speedMessage = speedShip.hit(armorShip.firePower);
-      print("Name: ${speedMessage["name"]}, Damage: ${speedMessage["damage"]} Health: ${speedMessage["health"]}\n");
+      print("\x1B[34mName: ${speedMessage["name"]}, Damage: ${speedMessage["damage"]} Health: ${speedMessage["health"]}\n\x1B[0m");
+     
+      // Ship has no more health
       if (speedShip.health <= 0){
         return {"name":"Speed Ship", "isDestroy":speedShip.isDestroy()};
       }
+      // Change player
       attack = true;
     }
 
     return {"name":"", "isDestroy":false};
-    // Randomly a spaceship is selected and hit first
-    // Spaceship hits each other 
-    // Until one of them is destroyed 
   }
 
   BattleField(this.attack);
 }
 
 void main(List<String> arguments) {
+  // Initializing the ships 
   ArmoredSpaceShip armorShip = ArmoredSpaceShip(91, 100, 10);
   HightSpeedSpaceShip speedShip = HightSpeedSpaceShip(false, 100, 10);
-    
+  
+  // Get a random starting player
   final random = Random();
   bool attack = random.nextBool();
+  // Initializing the game
   BattleField game = BattleField(attack);
 
   Map progess = {};
-  
+
+  // Main Game Loop
   do {
-     progess = game.startBattle(armorShip, speedShip);
+    // Starting the game 
+    progess = game.startBattle(armorShip, speedShip);
 
-     if (progess["isDestroy"]){
-      print("${progess["name"]} is destroyed!");
-     }
+    // Game ended
+    if (progess["isDestroy"]){
+     print("\x1B[31m${progess["name"]} is destroyed!\x1B[0m");
+    }
 
-     sleep(Duration(milliseconds:1000));
+    // Slow down the game
+    sleep(Duration(milliseconds:1000));
   }while(!progess["isDestroy"]);
   
 
