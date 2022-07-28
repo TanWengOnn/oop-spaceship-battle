@@ -149,6 +149,65 @@ void main(List<String> arguments) {
   int match = 1;
 
   // Main Game Loop
+  while(true){
+    printMenu();
+    String? input = stdin.readLineSync();
+
+    // Mode Selection     
+    try{
+      int mode = int.parse(input!);
+
+      if (mode == 1){
+        normalMode(armorShip, speedShip, progress, game);
+      }
+      else if (mode == 2){
+        firstToThree(armorShip, speedShip, progress, game, match);
+      }
+      else if (mode == 3){
+        break;
+      } 
+
+    } on Exception catch (e) {
+      print("please enter a number\n");
+      //print(e);
+    }
+
+  }
+
+}
+
+void printMenu() {
+  print("1. Normal Mode");
+  print("2. First to 3 Wins!");
+  print("3. Quit");
+  print("Select Mode(Number): ");
+}
+
+
+// 1 Match (Normal Mode)
+void normalMode(armorShip, speedShip, progress, game) {
+  armorShip = ArmoredSpaceShip(91, "Armor Ship", 100, 10, 0);
+  speedShip = HightSpeedSpaceShip(false, "Speed Ship", 100, 10, 0);
+  
+  do {
+    // Starting the game 
+    progress = game.startBattle(armorShip, speedShip);
+
+    // Game ended
+    if (progress["isDestroy"]){
+      print("\x1B[31m${progress["loseName"]} is destroyed!\x1B[0m");
+      print("\x1B[32m${progress["winName"]} Wins!\n\x1B[0m");
+    }
+
+    // Slow down the game
+    // sleep(Duration(milliseconds:1000));
+  }while(!progress["isDestroy"]);
+}
+
+// First to three wins
+void firstToThree(armorShip, speedShip, progress, game, match) {
+  armorShip = ArmoredSpaceShip(91, "Armor Ship", 100, 10, 0);
+  speedShip = HightSpeedSpaceShip(false, "Speed Ship", 100, 10, 0);
   do {
     // Starting the game 
     progress = game.startBattle(armorShip, speedShip);
@@ -167,16 +226,14 @@ void main(List<String> arguments) {
         armorShip = ArmoredSpaceShip(91, "Armor Ship", 100, 10, progress["loseScore"]);
         speedShip = HightSpeedSpaceShip(false, "Speed Ship", 100, 10, progress["winScore"]);
       }
-      
+     
       match += 1;
     }
 
     if (progress["winScore"] == 3){
-      print("${progress["winName"]} Wins!");
+      print("\x1B[32m${progress["winName"]} Wins!\n\x1B[0m");
     }
     // Slow down the game
     // sleep(Duration(milliseconds:1000));
   }while(progress["winScore"] != 3);
-
 }
-
